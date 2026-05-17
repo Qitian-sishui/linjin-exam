@@ -29,41 +29,6 @@
         .header h1 { font-size: 24px; margin-bottom: 10px; }
         .header p { opacity: 0.9; font-size: 14px; }
         .content { padding: 30px; }
-        .name-section {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        .name-input {
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            font-size: 18px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .name-input:focus { outline: none; border-color: #667eea; }
-        .start-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 50px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        .start-btn:disabled { background: #ccc; cursor: not-allowed; }
-        .exam-section { display: none; }
-        .welcome {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #667eea;
-            font-weight: bold;
-        }
         .progress-bar {
             background: #e0e0e0;
             height: 8px;
@@ -103,9 +68,18 @@
             transition: all 0.3s;
             margin-top: 8px;
         }
-        .answer-input:focus { outline: none; border-color: #667eea; }
-        .answer-input.correct { border-color: #4caf50; background: #f1f8f1; }
-        .answer-input.incorrect { border-color: #f44336; background: #fff5f5; }
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .answer-input.correct {
+            border-color: #4caf50;
+            background: #f1f8f1;
+        }
+        .answer-input.incorrect {
+            border-color: #f44336;
+            background: #fff5f5;
+        }
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -120,22 +94,12 @@
         .result { display: none; text-align: center; padding: 30px; }
         .result.show { display: block; }
         .score {
-            font-size: 64px;
+            font-size: 48px;
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin: 20px 0;
         }
-        .wrong-list { margin-top: 30px; text-align: left; }
-        .wrong-item {
-            background: #fff5f5;
-            border-left: 4px solid #f44336;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-        }
-        .wrong-item h4 { color: #f44336; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -145,234 +109,167 @@
             <p>共20题 | 填空题 | 请补全"严禁"后面的内容</p>
         </div>
         <div class="content">
-            <div class="name-section" id="nameSection">
-                <h2>📝 请输入你的姓名</h2>
-                <input type="text" class="name-input" id="userName" placeholder="输入姓名..." oninput="toggleStartBtn()">
-                <br>
-                <button class="start-btn" id="startBtn" onclick="startExam()" disabled>开始考试</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
             </div>
-            
-            <div class="exam-section" id="examSection">
-                <div class="welcome" id="welcomeMsg"></div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress"></div>
+            <form id="quizForm">
+                <div class="question">
+                    <span class="question-num">第 1 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a1" data-answer="主动或者协助伪造、编造虚假事故、虚假理赔单证" placeholder="请填写..." oninput="checkAnswer(1)"></div>
                 </div>
-                <form id="quizForm"></form>
+                <div class="question">
+                    <span class="question-num">第 2 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a2" data-answer="违规通融赔付或者扩大赔款金额" placeholder="请填写..." oninput="checkAnswer(2)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 3 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a3" data-answer="虚增、虚列、虚报理赔费用" placeholder="请填写..." oninput="checkAnswer(3)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 4 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a4" data-answer="对骗赔行为纵容、默许、提供便利" placeholder="请填写..." oninput="checkAnswer(4)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 5 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a5" data-answer="擅自截留赔款或者将赔款挪作他用" placeholder="请填写..." oninput="checkAnswer(5)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 6 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a6" data-answer="伪造或者使用伪造的公文、证件、印章" placeholder="请填写..." oninput="checkAnswer(6)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 7 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a7" data-answer="违规外授理赔权限" placeholder="请填写..." oninput="checkAnswer(7)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 8 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a8" data-answer="不同人员间工号串用" placeholder="请填写..." oninput="checkAnswer(8)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 9 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a9" data-answer="违规向非公司推荐修理厂送修车辆" placeholder="请填写..." oninput="checkAnswer(9)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 10 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a10" data-answer="在理赔第三方资源采购、委托、遴选中操纵、串通、泄密" placeholder="请填写..." oninput="checkAnswer(10)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 11 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a11" data-answer="插手、过问、干预理赔案件事项谋取不正当利益" placeholder="请填写..." oninput="checkAnswer(11)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 12 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a12" data-answer="违规收受、索取利害关系人财物" placeholder="请填写..." oninput="checkAnswer(12)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 13 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a13" data-answer="利用职务之便与第三方合作机构、人员发生财物往来或者兜售物品、商品" placeholder="请填写..." oninput="checkAnswer(13)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 14 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a14" data-answer="接受有碍公正理赔的宴请或者其他服务" placeholder="请填写..." oninput="checkAnswer(14)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 15 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a15" data-answer="本人及近亲属从事、参与与理赔有利益关联的经营活动" placeholder="请填写..." oninput="checkAnswer(15)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 16 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a16" data-answer="处理本人及近亲属的赔案" placeholder="请填写..." oninput="checkAnswer(16)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 17 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a17" data-answer="未经客户本人授权对外使用或泄露客户信息" placeholder="请填写..." oninput="checkAnswer(17)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 18 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a18" data-answer="吸毒、酒驾、赌博" placeholder="请填写..." oninput="checkAnswer(18)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 19 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a19" data-answer="理赔服务用车公车私用" placeholder="请填写..." oninput="checkAnswer(19)"></div>
+                </div>
+                <div class="question">
+                    <span class="question-num">第 20 题</span>
+                    <div><strong>严禁</strong><input type="text" class="answer-input" id="a20" data-answer="工作时间饮酒" placeholder="请填写..." oninput="checkAnswer(20)"></div>
+                </div>
                 <button type="button" class="btn" onclick="submitQuiz()">📝 提交考试</button>
-            </div>
-            
+            </form>
             <div class="result" id="result">
-                <h2>🎉 <span id="resultName"></span>，考试完成！</h2>
+                <h2>🎉 考试完成！</h2>
                 <div class="score" id="score">0</div>
                 <p id="resultText"></p>
-                <div class="wrong-list" id="wrongList"></div>
-                <button class="btn" onclick="location.reload()" style="margin-top:30px;">🔄 重新考试</button>
+                <button class="btn" onclick="location.reload()" style="margin-top:20px;">🔄 重新考试</button>
             </div>
         </div>
     </div>
-    
     <script>
-        const articles = [
-            "主动或者协助伪造、编造虚假事故、虚假理赔单证",
-            "违规通融赔付或者扩大赔款金额",
-            "虚增、虚列、虚报理赔费用",
-            "对骗赔行为纵容、默许、提供便利",
-            "擅自截留赔款或者将赔款挪作他用",
-            "伪造或者使用伪造的公文、证件、印章",
-            "违规外授理赔权限",
-            "不同人员间工号串用",
-            "违规向非公司推荐修理厂送修车辆",
-            "在理赔第三方资源采购、委托、遴选中操纵、串通、泄密",
-            "插手、过问、干预理赔案件事项谋取不正当利益",
-            "违规收受、索取利害关系人财物",
-            "利用职务之便与第三方合作机构、人员发生财物往来或者兜售物品、商品",
-            "接受有碍公正理赔的宴请或者其他服务",
-            "本人及近亲属从事、参与与理赔有利益关联的经营活动",
-            "处理本人及近亲属的赔案",
-            "未经客户本人授权对外使用或泄露客户信息",
-            "吸毒、酒驾、赌博",
-            "理赔服务用车公车私用",
-            "工作时间饮酒"
-        ];
-        
-        let examQuestions = [];
-        let currentUser = "";
-        
-        function toggleStartBtn() {
-            const name = document.getElementById("userName").value.trim();
-            document.getElementById("startBtn").disabled = (name === "");
-        }
-        
-        function startExam() {
-            currentUser = document.getElementById("userName").value.trim();
-            if (!currentUser) return;
-            
-            document.getElementById("nameSection").style.display = "none";
-            document.getElementById("examSection").style.display = "block";
-            document.getElementById("welcomeMsg").innerHTML = 
-                "👤 考生：" + currentUser + "　|　📅 " + new Date().toLocaleDateString("zh-CN");
-            
-            examQuestions = shuffleArray(articles.slice());
-            generateQuestions();
-        }
-        
-        function shuffleArray(arr) {
-            const newArr = arr.slice();
-            for (let i = newArr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-            }
-            return newArr;
-        }
-        
-        function generateQuestions() {
-            const form = document.getElementById("quizForm");
-            form.innerHTML = "";
-            
-            examQuestions.forEach((q, index) => {
-                const num = index + 1;
-                const div = document.createElement("div");
-                div.className = "question";
-                div.id = "q" + num;
-                div.innerHTML = '<span class="question-num">第 ' + num + ' 题</span>' +
-                    '<div><strong>严禁</strong>' +
-                    '<input type="text" class="answer-input" id="a' + num + 
-                    '" placeholder="请填写..." oninput="checkAnswer(' + num + ')">' +
-                    '</div>';
-                form.appendChild(div);
-            });
-        }
-        
         function normalize(str) {
-            return str.trim().replace(/\s+/g, "").toLowerCase();
+            return str.trim().replace(/\s+/g, '').toLowerCase();
         }
         
         function checkAnswer(num) {
-            const input = document.getElementById("a" + num);
+            const input = document.getElementById('a' + num);
+            const answer = input.dataset.answer;
             const userAnswer = input.value;
             
-            if (userAnswer.trim() === "") {
-                input.classList.remove("correct", "incorrect");
-                updateProgress();
+            if (userAnswer.trim() === '') {
+                input.classList.remove('correct', 'incorrect');
                 return;
             }
             
-            const normalizedUser = normalize(userAnswer);
-            let matchAny = false;
-            for (let article of articles) {
-                if (normalize(article) === normalizedUser) {
-                    matchAny = true;
-                    break;
-                }
-            }
-            
-            if (matchAny) {
-                input.classList.add("correct");
-                input.classList.remove("incorrect");
+            if (normalize(userAnswer) === normalize(answer)) {
+                input.classList.add('correct');
+                input.classList.remove('incorrect');
             } else {
-                input.classList.add("incorrect");
-                input.classList.remove("correct");
+                input.classList.add('incorrect');
+                input.classList.remove('correct');
             }
-            
             updateProgress();
         }
         
         function updateProgress() {
-            const inputs = document.querySelectorAll(".answer-input");
+            const inputs = document.querySelectorAll('.answer-input');
             let filled = 0;
             inputs.forEach(input => {
-                if (input.value.trim() !== "") filled++;
+                if (input.value.trim() !== '') filled++;
             });
-            const pct = (filled / examQuestions.length * 100).toFixed(0);
-            document.getElementById("progress").style.width = pct + "%";
+            document.getElementById('progress').style.width = (filled / 20 * 100) + '%';
         }
         
         function submitQuiz() {
             let score = 0;
-            const wrongItems = [];
-            const usedArticles = new Set();
-            
-            const allAnswers = [];
-            examQuestions.forEach((question, index) => {
-                const num = index + 1;
-                const input = document.getElementById("a" + num);
-                const userAnswer = input.value.trim();
-                allAnswers.push({
-                    num: num,
-                    answer: userAnswer,
-                    normalized: normalize(userAnswer),
-                    correctAnswer: question
-                });
-            });
-            
-            allAnswers.forEach(item => {
-                if (item.answer === "") {
-                    wrongItems.push({
-                        num: item.num,
-                        correct: item.correctAnswer,
-                        user: "(未作答)"
-                    });
-                    return;
-                }
-                
-                let matchedIndex = -1;
-                for (let i = 0; i < articles.length; i++) {
-                    if (normalize(articles[i]) === item.normalized && !usedArticles.has(i)) {
-                        matchedIndex = i;
-                        break;
-                    }
-                }
-                
-                if (matchedIndex !== -1) {
-                    usedArticles.add(matchedIndex);
+            for (let i = 1; i <= 20; i++) {
+                const input = document.getElementById('a' + i);
+                if (normalize(input.value) === normalize(input.dataset.answer)) {
                     score++;
-                } else {
-                    let isDuplicate = false;
-                    for (let i = 0; i < articles.length; i++) {
-                        if (normalize(articles[i]) === item.normalized) {
-                            isDuplicate = true;
-                            break;
-                        }
-                    }
-                    
-                    wrongItems.push({
-                        num: item.num,
-                        correct: item.correctAnswer,
-                        user: item.answer + (isDuplicate ? " (⚠️ 重复答案，不给分)" : " (❌ 答案错误)")
-                    });
                 }
-            });
-            
-            const pct = Math.round(score / examQuestions.length * 100);
-            document.getElementById("score").textContent = pct + "分";
-            document.getElementById("resultName").textContent = currentUser;
-            
-            let comment = "";
-            if (pct >= 90) comment = "🎊 优秀！你对禁令非常熟悉！";
-            else if (pct >= 60) comment = "👍 及格！还需要加强学习。";
-            else comment = "💪 不及格，请认真学习禁令内容！";
-            
-            document.getElementById("resultText").innerHTML = 
-                "答对 <strong>" + score + "</strong> 题，共 <strong>" + examQuestions.length + "</strong> 题<br>" + comment;
-            
-            const wrongDiv = document.getElementById("wrongList");
-            if (wrongItems.length > 0) {
-                let html = "<h3>❌ 错题详情：</h3>";
-                wrongItems.forEach(item => {
-                    html += '<div class="wrong-item">' +
-                        "<h4>第 " + item.num + " 题</h4>" +
-                        "<p><strong>正确答案：</strong>严禁" + item.correct + "</p>" +
-                        "<p><strong>你的答案：</strong>" + item.user + "</p>" +
-                        "</div>";
-                });
-                wrongDiv.innerHTML = html;
-            } else {
-                wrongDiv.innerHTML = "<h3>🎉 太棒了！全部答对！</h3>";
             }
             
-            document.getElementById("examSection").style.display = "none";
-            document.getElementById("result").classList.add("show");
+            const percentage = (score / 20 * 100).toFixed(0);
+            document.getElementById('score').textContent = percentage + '分';
+            
+            let comment = '';
+            if (percentage >= 90) comment = '🎊 优秀！';
+            else if (percentage >= 60) comment = '👍 及格！';
+            else comment = '💪 需要加强学习！';
+            
+            document.getElementById('resultText').textContent = `答对 ${score}/20 题 | ${comment}`;
+            document.getElementById('quizForm').style.display = 'none';
+            document.getElementById('result').classList.add('show');
         }
+        
+        // 保存进度
+        document.querySelectorAll('.answer-input').forEach(input => {
+            input.addEventListener('input', function() {
+                localStorage.setItem(this.id, this.value);
+            });
+            const saved = localStorage.getItem(input.id);
+            if (saved) {
+                input.value = saved;
+                checkAnswer(parseInt(input.id.replace('a', '')));
+            }
+        });
     </script>
 </body>
 </html>
