@@ -1,0 +1,24 @@
+name: Sync to Gitee
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Push to Gitee
+        run: |
+          git remote add gitee https://jiang-chuwu:200042jcw.,@gitee.com/jiang-chuwu/linjin-exam.git
+          git push gitee main:master --force
+      - name: Build Gitee Pages
+        uses: yanglbme/gitee-pages-action@main
+        with:
+          gitee-username: jiang-chuwu
+          gitee-password: 200042jcw.,
+          gitee-repo: jiang-chuwu/linjin-exam
+          branch: master
