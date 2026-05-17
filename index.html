@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>理赔廉洁从业禁令考试 - 带管理后台</title>
+    <title>理赔廉洁从业禁令考试</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -27,8 +27,6 @@
             text-align: center;
         }
         .content { padding: 30px; }
-        
-        /* 姓名输入 */
         .name-section { text-align: center; padding: 50px 20px; }
         .name-input {
             width: 100%; max-width: 400px; padding: 15px;
@@ -44,8 +42,6 @@
         }
         .start-btn:hover { transform: translateY(-2px); }
         .start-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
-        
-        /* 考试区域 */
         .exam-section { display: none; }
         .welcome {
             background: #f0f0f0; padding: 15px; border-radius: 10px;
@@ -79,14 +75,13 @@
             font-size: 15px; border-radius: 10px; cursor: pointer;
             width: 100%; margin-top: 15px;
         }
-        
-        /* 结果页面 */
         .result { display: none; text-align: center; padding: 30px; }
         .result.show { display: block; }
         .score {
             font-size: 64px; font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin: 20px 0;
         }
         .wrong-list { margin-top: 30px; text-align: left; }
@@ -95,22 +90,17 @@
             padding: 15px; margin: 10px 0; border-radius: 8px;
         }
         .wrong-item h4 { color: #f44336; margin-bottom: 8px; }
-        
-        /* 管理后台 */
         .admin-section { display: none; padding: 30px; }
         .admin-header {
             background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
             color: white; padding: 20px; border-radius: 10px;
             margin-bottom: 30px; text-align: center;
         }
-        .admin-table {
-            width: 100%; border-collapse: collapse; margin-top: 20px;
-        }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .admin-table th, .admin-table td {
             padding: 12px; text-align: left; border-bottom: 1px solid #ddd;
         }
         .admin-table th { background: #f8f9fa; font-weight: bold; }
-        .admin-table tr:hover { background: #f0f0f0; }
         .badge {
             display: inline-block; padding: 3px 10px; border-radius: 12px;
             font-size: 12px; font-weight: bold;
@@ -123,7 +113,6 @@
             padding: 5px 15px; border-radius: 5px; cursor: pointer;
             font-size: 12px;
         }
-        .detail-btn:hover { background: #1976d2; }
         .back-btn {
             background: #9e9e9e; color: white; border: none;
             padding: 10px 30px; border-radius: 8px; cursor: pointer;
@@ -148,7 +137,7 @@
             <p>共20题 | 填空题 | 请补全"严禁"后面的内容</p>
         </div>
         <div class="content">
-            <!-- 姓名输入页面 -->
+            <!-- 姓名输入 -->
             <div class="name-section" id="nameSection">
                 <h2>📝 请输入你的姓名</h2>
                 <input type="text" class="name-input" id="userName" 
@@ -156,7 +145,9 @@
                 <br>
                 <button class="start-btn" id="startBtn" onclick="startExam()" disabled>开始考试</button>
                 <br><br>
-                <button class="btn" onclick="showAdmin()" style="width: auto; padding: 10px 30px; font-size: 14px; background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);">
+                <button class="btn" onclick="showAdmin()" 
+                        style="width: auto; padding: 10px 30px; font-size: 14px; 
+                               background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);">
                     🔐 管理后台
                 </button>
             </div>
@@ -202,7 +193,7 @@
     </div>
     
     <script>
-        // 20条禁令
+        // 20条禁令（正确答案）
         const articles = [
             "主动或者协助伪造、编造虚假事故、虚假理赔单证",
             "违规通融赔付或者扩大赔款金额",
@@ -325,30 +316,33 @@
             let score = 0;
             const wrongItems = [];
             const usedArticles = new Set();
-            const answers = [];
             
+            // 收集所有答案
+            const allAnswers = [];
             examQuestions.forEach((question, index) => {
                 const num = index + 1;
                 const input = document.getElementById("a" + num);
                 const userAnswer = input.value.trim();
-                answers.push({
+                allAnswers.push({
                     num: num,
-                    question: question,
-                    answer: userAnswer,
+                    correctAnswer: question,
+                    userAnswer: userAnswer,
                     normalized: normalize(userAnswer)
                 });
             });
             
-            answers.forEach(item => {
-                if (item.answer === "") {
+            // 智能判分
+            allAnswers.forEach(item => {
+                if (item.userAnswer === "") {
                     wrongItems.push({
                         num: item.num,
-                        correct: item.question,
+                        correct: item.correctAnswer,
                         user: "(未作答)"
                     });
                     return;
                 }
                 
+                // 查找匹配的答案（还未被使用）
                 let matchedIndex = -1;
                 for (let i = 0; i < articles.length; i++) {
                     if (normalize(articles[i]) === item.normalized && !usedArticles.has(i)) {
@@ -358,9 +352,11 @@
                 }
                 
                 if (matchedIndex !== -1) {
+                    // 匹配成功
                     usedArticles.add(matchedIndex);
                     score++;
                 } else {
+                    // 检查是否是重复答案
                     let isDuplicate = false;
                     for (let i = 0; i < articles.length; i++) {
                         if (normalize(articles[i]) === item.normalized) {
@@ -371,8 +367,8 @@
                     
                     wrongItems.push({
                         num: item.num,
-                        correct: item.question,
-                        user: item.answer + (isDuplicate ? " (⚠️ 重复答案)" : "")
+                        correct: item.correctAnswer,
+                        user: item.userAnswer + (isDuplicate ? " (⚠️ 重复答案)" : "")
                     });
                 }
             });
@@ -386,7 +382,7 @@
                 total: examQuestions.length,
                 percentage: Math.round(score / examQuestions.length * 100),
                 wrongCount: wrongItems.length,
-                answers: answers,
+                answers: allAnswers,
                 wrongItems: wrongItems
             };
             
@@ -443,11 +439,11 @@
             const container = document.getElementById("adminContent");
             
             if (examRecords.length === 0) {
-                container.innerHTML = "<p style='text-align:center;color:#999;'>暂无考试记录</p>";
+                container.innerHTML = '<p style="text-align:center;color:#999;">暂无考试记录</p>';
                 return;
             }
             
-            let html = "<table class='admin-table'>" +
+            let html = '<table class="admin-table">' +
                 "<tr>" +
                 "<th>序号</th>" +
                 "<th>姓名</th>" +
@@ -466,7 +462,7 @@
                     "<td>" + (index + 1) + "</td>" +
                     "<td><strong>" + record.name + "</strong></td>" +
                     "<td>" + record.date + "</td>" +
-                    "<td><span class='badge " + badgeClass + "'>" + record.score + "/" + record.total + " (" + record.percentage + "分)</span></td>" +
+                    "<td><span class='" + badgeClass + "'>" + record.score + "/" + record.total + " (" + record.percentage + "分)</span></td>" +
                     "<td>" + (record.wrongCount > 0 ? "<span style='color:#f44336;'>" + record.wrongCount + "题</span>" : "<span style='color:#4caf50;'>无</span>") + "</td>" +
                     "<td><button class='detail-btn' onclick='showDetail(" + record.id + ")'>查看详情</button></td>" +
                     "</tr>";
@@ -487,11 +483,13 @@
             html += "<h4>答题详情：</h4>";
             
             record.answers.forEach(item => {
-                const isCorrect = item.answer && record.wrongItems.filter(w => w.num === item.num).length === 0;
+                const isCorrect = item.userAnswer && 
+                    !record.wrongItems.find(w => w.num === item.num);
+                
                 html += "<div style='margin:10px 0;padding:10px;background:" + (isCorrect ? "#f1f8f1" : "#fff5f5") + ";border-radius:5px;'>" +
                     "<strong>第" + item.num + "题：</strong>" +
-                    "<br>正确答案：严禁" + item.question +
-                    "<br>你的答案：" + (item.answer || "(未作答)") +
+                    "<br>正确答案：严禁" + item.correctAnswer +
+                    "<br>你的答案：" + (item.userAnswer || "(未作答)") +
                     "</div>";
             });
             
