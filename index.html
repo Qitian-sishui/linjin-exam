@@ -13,7 +13,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 1000px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -26,7 +26,11 @@
             padding: 30px;
             text-align: center;
         }
+        .header h1 { font-size: 24px; margin-bottom: 10px; }
+        .header p { opacity: 0.9; font-size: 14px; }
         .content { padding: 30px; }
+        
+        /* 姓名输入 */
         .name-section { text-align: center; padding: 50px 20px; }
         .name-input {
             width: 100%; max-width: 400px; padding: 15px;
@@ -42,6 +46,8 @@
         }
         .start-btn:hover { transform: translateY(-2px); }
         .start-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        
+        /* 考试区域 */
         .exam-section { display: none; }
         .welcome {
             background: #f0f0f0; padding: 15px; border-radius: 10px;
@@ -75,6 +81,8 @@
             font-size: 15px; border-radius: 10px; cursor: pointer;
             width: 100%; margin-top: 15px;
         }
+        
+        /* 结果页面 */
         .result { display: none; text-align: center; padding: 30px; }
         .result.show { display: block; }
         .score {
@@ -90,6 +98,8 @@
             padding: 15px; margin: 10px 0; border-radius: 8px;
         }
         .wrong-item h4 { color: #f44336; margin-bottom: 8px; }
+        
+        /* 管理后台 */
         .admin-section { display: none; padding: 30px; }
         .admin-header {
             background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
@@ -123,7 +133,9 @@
             width: 100%; height: 100%; background: rgba(0,0,0,0.5);
             z-index: 1000;
         }
-        .modal.show { display: flex; justify-content: center; align-items: center; }
+        .modal.show { 
+            display: flex; justify-content: center; align-items: center; 
+        }
         .modal-content {
             background: white; padding: 30px; border-radius: 15px;
             max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;
@@ -137,7 +149,7 @@
             <p>共20题 | 填空题 | 请补全"严禁"后面的内容</p>
         </div>
         <div class="content">
-            <!-- 姓名输入 -->
+            <!-- 姓名输入页面 -->
             <div class="name-section" id="nameSection">
                 <h2>📝 请输入你的姓名</h2>
                 <input type="text" class="name-input" id="userName" 
@@ -193,7 +205,7 @@
     </div>
     
     <script>
-        // 20条禁令（正确答案）
+        // 20条禁令（全局变量）
         const articles = [
             "主动或者协助伪造、编造虚假事故、虚假理赔单证",
             "违规通融赔付或者扩大赔款金额",
@@ -217,12 +229,13 @@
             "工作时间饮酒"
         ];
         
-        let examQuestions = [];
+        let examQuestions = [];  // 存储随机排序后的题目
         let currentUser = "";
         
         // 初始化：加载已有考试记录
         let examRecords = JSON.parse(localStorage.getItem('examRecords') || '[]');
         
+        // ==================== 姓名输入相关 ====================
         function toggleStartBtn() {
             const name = document.getElementById("userName").value.trim();
             document.getElementById("startBtn").disabled = (name.length < 2);
@@ -237,6 +250,7 @@
             document.getElementById("welcomeMsg").innerHTML = 
                 "👤 考生：" + currentUser + "　|　📅 " + new Date().toLocaleDateString("zh-CN");
             
+            // 随机打乱20条禁令作为考试题目
             examQuestions = shuffleArray(articles.slice());
             generateQuestions();
         }
@@ -250,6 +264,7 @@
             return newArr;
         }
         
+        // ==================== 生成题目 ====================
         function generateQuestions() {
             const form = document.getElementById("quizForm");
             form.innerHTML = "";
@@ -268,6 +283,7 @@
             });
         }
         
+        // ==================== 实时检查答案 ====================
         function normalize(str) {
             return str.trim().replace(/\s+/g, "").toLowerCase();
         }
@@ -282,6 +298,7 @@
                 return;
             }
             
+            // 实时检查：只要匹配20条中任一条就显示绿色
             const normalizedUser = normalize(userAnswer);
             let matchAny = false;
             for (let article of articles) {
@@ -312,32 +329,37 @@
             document.getElementById("progress").style.width = pct + "%";
         }
         
+        // ==================== 提交考试（核心判分逻辑）====================
         function submitQuiz() {
             let score = 0;
             const wrongItems = [];
-            const usedArticles = new Set();
+            const usedArticles = new Set();  // 已匹配的禁令索引
             
-            // 收集所有答案
+            // 第一步：收集所有答案
             const allAnswers = [];
             examQuestions.forEach((question, index) => {
                 const num = index + 1;
                 const input = document.getElementById("a" + num);
                 const userAnswer = input.value.trim();
+                
                 allAnswers.push({
                     num: num,
-                    correctAnswer: question,
+                    expectedAnswer: question,  // 这道随机题对应的正确答案
                     userAnswer: userAnswer,
-                    normalized: normalize(userAnswer)
+                    normalized: normalize(userAnswer),
+                    matchedIndex: -1  // 用户答案实际匹配的禁令索引
                 });
             });
             
-            // 智能判分
+            // 第二步：智能判分
             allAnswers.forEach(item => {
                 if (item.userAnswer === "") {
+                    // 未作答
                     wrongItems.push({
                         num: item.num,
-                        correct: item.correctAnswer,
-                        user: "(未作答)"
+                        userAnswer: "(未作答)",
+                        matchedText: "未作答",
+                        isDuplicate: false
                     });
                     return;
                 }
@@ -352,7 +374,8 @@
                 }
                 
                 if (matchedIndex !== -1) {
-                    // 匹配成功
+                    // 匹配成功，标记为已使用
+                    item.matchedIndex = matchedIndex;
                     usedArticles.add(matchedIndex);
                     score++;
                 } else {
@@ -367,13 +390,16 @@
                     
                     wrongItems.push({
                         num: item.num,
-                        correct: item.correctAnswer,
-                        user: item.userAnswer + (isDuplicate ? " (⚠️ 重复答案)" : "")
+                        userAnswer: item.userAnswer,
+                        matchedText: isDuplicate ? 
+                            ("与第" + (allAnswers.find(a => a.matchedIndex === i && i >= 0)?.num || "?") + "题重复) : 
+                            "不匹配任何禁令",
+                        isDuplicate: isDuplicate
                     });
                 }
             });
             
-            // 保存考试记录
+            // 第三步：保存考试记录
             const record = {
                 id: Date.now(),
                 name: currentUser,
@@ -389,27 +415,28 @@
             examRecords.push(record);
             localStorage.setItem('examRecords', JSON.stringify(examRecords));
             
-            // 显示结果
+            // 第四步：显示结果
             const pct = Math.round(score / examQuestions.length * 100);
             document.getElementById("score").textContent = pct + "分";
             document.getElementById("resultName").textContent = currentUser;
             
             let comment = "";
-            if (pct >= 90) comment = "🎊 优秀！";
-            else if (pct >= 60) comment = "👍 及格！";
-            else comment = "💪 需加强学习！";
+            if (pct >= 90) comment = "🎊 优秀！你对禁令非常熟悉！";
+            else if (pct >= 60) comment = "👍 及格！还需要加强学习。";
+            else comment = "💪 不及格，请认真学习禁令内容！";
             
             document.getElementById("resultText").innerHTML = 
                 "答对 <strong>" + score + "</strong> 题，共 <strong>" + examQuestions.length + "</strong> 题<br>" + comment;
             
+            // 显示错题详情
             const wrongDiv = document.getElementById("wrongList");
             if (wrongItems.length > 0) {
                 let html = "<h3>❌ 错题详情：</h3>";
                 wrongItems.forEach(item => {
                     html += '<div class="wrong-item">' +
                         "<h4>第 " + item.num + " 题</h4>" +
-                        "<p><strong>正确答案：</strong>严禁" + item.correct + "</p>" +
-                        "<p><strong>你的答案：</strong>" + item.user + "</p>" +
+                        "<p><strong>你的答案：</strong>" + item.userAnswer + "</p>" +
+                        "<p><strong>判分结果：</strong>" + item.matchedText + "</p>" +
                         "</div>";
                 });
                 wrongDiv.innerHTML = html;
@@ -421,7 +448,7 @@
             document.getElementById("result").classList.add("show");
         }
         
-        // 管理后台
+        // ==================== 管理后台 ====================
         function showAdmin() {
             const password = prompt("请输入管理密码：");
             if (password !== "admin123") {
@@ -462,7 +489,7 @@
                     "<td>" + (index + 1) + "</td>" +
                     "<td><strong>" + record.name + "</strong></td>" +
                     "<td>" + record.date + "</td>" +
-                    "<td><span class='" + badgeClass + "'>" + record.score + "/" + record.total + " (" + record.percentage + "分)</span></td>" +
+                    "<td><span class='badge " + badgeClass + "'>" + record.score + "/" + record.total + " (" + record.percentage + "分)</span></td>" +
                     "<td>" + (record.wrongCount > 0 ? "<span style='color:#f44336;'>" + record.wrongCount + "题</span>" : "<span style='color:#4caf50;'>无</span>") + "</td>" +
                     "<td><button class='detail-btn' onclick='showDetail(" + record.id + ")'>查看详情</button></td>" +
                     "</tr>";
@@ -483,13 +510,11 @@
             html += "<h4>答题详情：</h4>";
             
             record.answers.forEach(item => {
-                const isCorrect = item.userAnswer && 
-                    !record.wrongItems.find(w => w.num === item.num);
-                
+                const isCorrect = item.matchedIndex >= 0;
                 html += "<div style='margin:10px 0;padding:10px;background:" + (isCorrect ? "#f1f8f1" : "#fff5f5") + ";border-radius:5px;'>" +
-                    "<strong>第" + item.num + "题：</strong>" +
-                    "<br>正确答案：严禁" + item.correctAnswer +
-                    "<br>你的答案：" + (item.userAnswer || "(未作答)") +
+                    "<strong>第" + item.num + "题：</strong><br>" +
+                    "你的答案：" + (item.userAnswer || "(未作答)") + "<br>" +
+                    "判分结果：" + (isCorrect ? ("✅ 正确（匹配：" + articles[item.matchedIndex] + ")") : item.matchedText) +
                     "</div>";
             });
             
