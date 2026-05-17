@@ -29,15 +29,9 @@
         .header h1 { font-size: 24px; margin-bottom: 10px; }
         .header p { opacity: 0.9; font-size: 14px; }
         .content { padding: 30px; }
-        
-        /* 姓名输入 */
         .name-section {
             text-align: center;
             padding: 50px 20px;
-        }
-        .name-section h2 {
-            color: #333;
-            margin-bottom: 20px;
         }
         .name-input {
             width: 100%;
@@ -49,10 +43,7 @@
             margin-bottom: 20px;
             text-align: center;
         }
-        .name-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        .name-input:focus { outline: none; border-color: #667eea; }
         .start-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -61,15 +52,8 @@
             font-size: 18px;
             border-radius: 10px;
             cursor: pointer;
-            transition: transform 0.2s;
         }
-        .start-btn:hover { transform: translateY(-2px); }
-        .start-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        /* 考试区域 */
+        .start-btn:disabled { background: #ccc; cursor: not-allowed; }
         .exam-section { display: none; }
         .welcome {
             background: #f0f0f0;
@@ -119,18 +103,9 @@
             transition: all 0.3s;
             margin-top: 8px;
         }
-        .answer-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .answer-input.correct {
-            border-color: #4caf50;
-            background: #f1f8f1;
-        }
-        .answer-input.incorrect {
-            border-color: #f44336;
-            background: #fff5f5;
-        }
+        .answer-input:focus { outline: none; border-color: #667eea; }
+        .answer-input.correct { border-color: #4caf50; background: #f1f8f1; }
+        .answer-input.incorrect { border-color: #f44336; background: #fff5f5; }
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -142,8 +117,6 @@
             width: 100%;
             margin-top: 15px;
         }
-        
-        /* 结果 */
         .result { display: none; text-align: center; padding: 30px; }
         .result.show { display: block; }
         .score {
@@ -154,10 +127,7 @@
             -webkit-text-fill-color: transparent;
             margin: 20px 0;
         }
-        .wrong-list {
-            margin-top: 30px;
-            text-align: left;
-        }
+        .wrong-list { margin-top: 30px; text-align: left; }
         .wrong-item {
             background: #fff5f5;
             border-left: 4px solid #f44336;
@@ -165,10 +135,7 @@
             margin: 10px 0;
             border-radius: 8px;
         }
-        .wrong-item h4 {
-            color: #f44336;
-            margin-bottom: 8px;
-        }
+        .wrong-item h4 { color: #f44336; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -178,7 +145,6 @@
             <p>共20题 | 填空题 | 请补全"严禁"后面的内容</p>
         </div>
         <div class="content">
-            <!-- 姓名输入 -->
             <div class="name-section" id="nameSection">
                 <h2>📝 请输入你的姓名</h2>
                 <input type="text" class="name-input" id="userName" placeholder="输入姓名..." oninput="toggleStartBtn()">
@@ -186,7 +152,6 @@
                 <button class="start-btn" id="startBtn" onclick="startExam()" disabled>开始考试</button>
             </div>
             
-            <!-- 考试 -->
             <div class="exam-section" id="examSection">
                 <div class="welcome" id="welcomeMsg"></div>
                 <div class="progress-bar">
@@ -196,7 +161,6 @@
                 <button type="button" class="btn" onclick="submitQuiz()">📝 提交考试</button>
             </div>
             
-            <!-- 结果 -->
             <div class="result" id="result">
                 <h2>🎉 <span id="resultName"></span>，考试完成！</h2>
                 <div class="score" id="score">0</div>
@@ -208,7 +172,6 @@
     </div>
     
     <script>
-        // 20条禁令
         const articles = [
             "主动或者协助伪造、编造虚假事故、虚假理赔单证",
             "违规通融赔付或者扩大赔款金额",
@@ -235,40 +198,33 @@
         let examQuestions = [];
         let currentUser = "";
         
-        // 切换开始按钮状态
         function toggleStartBtn() {
             const name = document.getElementById("userName").value.trim();
             document.getElementById("startBtn").disabled = (name === "");
         }
         
-        // 开始考试
         function startExam() {
             currentUser = document.getElementById("userName").value.trim();
             if (!currentUser) return;
             
-            // 隐藏姓名页面，显示考试页面
             document.getElementById("nameSection").style.display = "none";
             document.getElementById("examSection").style.display = "block";
             document.getElementById("welcomeMsg").innerHTML = 
                 "👤 考生：" + currentUser + "　|　📅 " + new Date().toLocaleDateString("zh-CN");
             
-            // 随机打乱题目
             examQuestions = shuffleArray(articles.slice());
-            
-            // 生成题目
             generateQuestions();
         }
         
-        // 随机打乱数组
         function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
+            const newArr = arr.slice();
+            for (let i = newArr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
             }
-            return arr;
+            return newArr;
         }
         
-        // 生成题目HTML
         function generateQuestions() {
             const form = document.getElementById("quizForm");
             form.innerHTML = "";
@@ -281,21 +237,18 @@
                 div.innerHTML = '<span class="question-num">第 ' + num + ' 题</span>' +
                     '<div><strong>严禁</strong>' +
                     '<input type="text" class="answer-input" id="a' + num + 
-                    '" data-answer="' + q + '" placeholder="请填写..." oninput="checkAnswer(' + num + ')">' +
+                    '" placeholder="请填写..." oninput="checkAnswer(' + num + ')">' +
                     '</div>';
                 form.appendChild(div);
             });
         }
         
-        // 标准化字符串（去空格、转小写）
         function normalize(str) {
             return str.trim().replace(/\s+/g, "").toLowerCase();
         }
         
-        // 实时检查答案
         function checkAnswer(num) {
             const input = document.getElementById("a" + num);
-            const correctAnswer = input.getAttribute("data-answer");
             const userAnswer = input.value;
             
             if (userAnswer.trim() === "") {
@@ -304,8 +257,16 @@
                 return;
             }
             
-            // 精确匹配
-            if (normalize(userAnswer) === normalize(correctAnswer)) {
+            const normalizedUser = normalize(userAnswer);
+            let matchAny = false;
+            for (let article of articles) {
+                if (normalize(article) === normalizedUser) {
+                    matchAny = true;
+                    break;
+                }
+            }
+            
+            if (matchAny) {
                 input.classList.add("correct");
                 input.classList.remove("incorrect");
             } else {
@@ -316,7 +277,6 @@
             updateProgress();
         }
         
-        // 更新进度条
         function updateProgress() {
             const inputs = document.querySelectorAll(".answer-input");
             let filled = 0;
@@ -327,29 +287,62 @@
             document.getElementById("progress").style.width = pct + "%";
         }
         
-        // 提交考试
         function submitQuiz() {
             let score = 0;
             const wrongItems = [];
+            const usedArticles = new Set();
             
+            const allAnswers = [];
             examQuestions.forEach((question, index) => {
                 const num = index + 1;
                 const input = document.getElementById("a" + num);
-                const userAnswer = input.value;
-                const isCorrect = (normalize(userAnswer) === normalize(question));
+                const userAnswer = input.value.trim();
+                allAnswers.push({
+                    num: num,
+                    answer: userAnswer,
+                    normalized: normalize(userAnswer),
+                    correctAnswer: question
+                });
+            });
+            
+            allAnswers.forEach(item => {
+                if (item.answer === "") {
+                    wrongItems.push({
+                        num: item.num,
+                        correct: item.correctAnswer,
+                        user: "(未作答)"
+                    });
+                    return;
+                }
                 
-                if (isCorrect) {
+                let matchedIndex = -1;
+                for (let i = 0; i < articles.length; i++) {
+                    if (normalize(articles[i]) === item.normalized && !usedArticles.has(i)) {
+                        matchedIndex = i;
+                        break;
+                    }
+                }
+                
+                if (matchedIndex !== -1) {
+                    usedArticles.add(matchedIndex);
                     score++;
                 } else {
+                    let isDuplicate = false;
+                    for (let i = 0; i < articles.length; i++) {
+                        if (normalize(articles[i]) === item.normalized) {
+                            isDuplicate = true;
+                            break;
+                        }
+                    }
+                    
                     wrongItems.push({
-                        num: num,
-                        correct: question,
-                        user: userAnswer || "(未作答)"
+                        num: item.num,
+                        correct: item.correctAnswer,
+                        user: item.answer + (isDuplicate ? " (⚠️ 重复答案，不给分)" : " (❌ 答案错误)")
                     });
                 }
             });
             
-            // 显示结果
             const pct = Math.round(score / examQuestions.length * 100);
             document.getElementById("score").textContent = pct + "分";
             document.getElementById("resultName").textContent = currentUser;
@@ -362,7 +355,6 @@
             document.getElementById("resultText").innerHTML = 
                 "答对 <strong>" + score + "</strong> 题，共 <strong>" + examQuestions.length + "</strong> 题<br>" + comment;
             
-            // 显示错题
             const wrongDiv = document.getElementById("wrongList");
             if (wrongItems.length > 0) {
                 let html = "<h3>❌ 错题详情：</h3>";
@@ -378,7 +370,6 @@
                 wrongDiv.innerHTML = "<h3>🎉 太棒了！全部答对！</h3>";
             }
             
-            // 切换页面
             document.getElementById("examSection").style.display = "none";
             document.getElementById("result").classList.add("show");
         }
