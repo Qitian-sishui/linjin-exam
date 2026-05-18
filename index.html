@@ -199,7 +199,22 @@
         var examRecords = JSON.parse(localStorage.getItem("examRecords") || "[]");
 
         function normalize(s) {
-            return s.trim().replace(/\s+/g, "").toLowerCase();
+            // 去除所有空白、标点、特殊字符，只保留中文/字母/数字
+            return s.replace(/[\s\u3000\u00A0]/g, "").replace(/[，。、；：！？《》【】（）""''—…·\.,;:!?<>\[\](){}"'_\-\/\\]/g, "").toLowerCase();
+        }
+
+        function fuzzyMatch(userAns, articleAns) {
+            var nu = normalize(userAns);
+            var na = normalize(articleAns);
+            if (nu === na) return true;
+            // 去除所有非中文非字母非数字字符后再比较
+            var nu2 = nu.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+            var na2 = na.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+            if (nu2 === na2) return true;
+            // 包含匹配：用户答案包含在禁令中 或 禁令包含用户答案
+            if (nu2.length > 3 && na2.indexOf(nu2) >= 0) return true;
+            if (nu2.length > 3 && nu2.indexOf(na2) >= 0) return true;
+            return false;
         }
 
         function toggleStartBtn() {
@@ -247,10 +262,9 @@
                 updateProgress();
                 return;
             }
-            var nv = normalize(val);
             var found = false;
             for (var k = 0; k < articles.length; k++) {
-                if (normalize(articles[k]) === nv) { found = true; break; }
+                if (fuzzyMatch(val, articles[k])) { found = true; break; }
             }
             if (found) {
                 input.classList.add("correct");
@@ -304,10 +318,10 @@
                     continue;
                 }
 
-                // 尝试匹配一条未使用的禁令
+                // 尝试匹配一条未使用的禁令（使用模糊匹配）
                 var matchIdx = -1;
                 for (var j = 0; j < articles.length; j++) {
-                    if (!usedSet[j] && normalize(articles[j]) === item.norm) {
+                    if (!usedSet[j] && fuzzyMatch(item.userAns, articles[j])) {
                         matchIdx = j;
                         break;
                     }
@@ -321,7 +335,7 @@
                     // 判断是重复还是完全错误
                     var existsInArticles = false;
                     for (var j = 0; j < articles.length; j++) {
-                        if (normalize(articles[j]) === item.norm) {
+                        if (fuzzyMatch(item.userAns, articles[j])) {
                             existsInArticles = true;
                             break;
                         }
